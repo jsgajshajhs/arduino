@@ -1,0 +1,38 @@
+#include <SoftwareSerial.h> // Librería necesaria para trabajar con Bluetooth
+SoftwareSerial BT(10, 11); // Definimos los pines TX y RX del Arduino conectados al Bluetooth
+
+const int pinJoyX = A0;
+const int pinJoyY = A1;
+
+void setup() {
+  BT.begin(9600); // Inicializa el puerto serie BT
+}
+
+void loop() {
+  int Xvalue = 0; // Variables para almacenar los valores XY de las lecturas del joystick
+  int Yvalue = 0;
+
+  Xvalue = analogRead(pinJoyX); // Se almacenan las lecturas del joystick
+  Yvalue = analogRead(pinJoyY);
+
+  // NOTA: Cuando el stick está quieto las lecturas normales son entre 500 y 510. Se establece una tolerancia para toques accidentales.
+  if (Xvalue > 650) { // Si se mueve el stick a la derecha se envía un '1' al otro módulo
+    BT.write('1');
+    delay(500);
+  }
+
+  if (Xvalue < 350) { // Si se mueve el stick a la izquierda se envía un '2' al otro módulo
+    BT.write('2');
+    delay(500);
+  }
+
+  if (Yvalue > 650) { // Si se mueve el stick hacia arriba se envía un '3' al otro módulo
+    BT.write('3');
+    delay(500);
+  }
+
+    if (Yvalue < 350) { // Si se mueve el stick hacia abajo se envía un '0' al otro módulo
+    BT.write('0');
+    delay(500);
+  }
+}
