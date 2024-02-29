@@ -1,0 +1,57 @@
+#include <LedControl.h> // Librería necesaria para trabajar con la matriz LED
+#include <SoftwareSerial.h>
+LedControl lc = LedControl(10, 11, 12, 1); // Pins: DIN, CLK, CS, número de matrices
+SoftwareSerial BT(2, 3);
+
+char BTValue = '0'; // Variable que indica el comportamiento que debe tener la matriz LED en función de la información que recibe a través de Bluetooth
+
+void setup() {
+  BT.begin(9600);
+  lc.shutdown(0, false); // Despierta el MAX7219 (matriz LED)
+  lc.setIntensity(0, 8); // Configura la intensidad del brillo (ajusta según sea necesario)
+  lc.clearDisplay(0); // Limpia la pantalla
+}
+ 
+void loop() {
+  if (BT.available()) { // Si se reciben datos desde Bluetooth se almacenan en BTValue
+    BTValue = BT.read();
+  }
+
+  if (BTValue == '0') lc.clearDisplay(0); // Si el dato recibido es '0' se apagan todas las luces
+  if (BTValue == '1') displayArrowLeft(); // Si el dato recibido es '1' se muestra una flecha hacia la izquierda
+  if (BTValue == '2') displayArrowRight(); // Si el dato recibido es '2' se muestra una flecha hacia la derecha
+  if (BTValue == '3') stop(); // Si el dato recibido es '3' se encienden todas las luces
+}
+
+void displayArrowLeft() {
+  lc.setRow(0, 0, B00011100);
+  lc.setRow(0, 1, B00111000);
+  lc.setRow(0, 2, B01110000);
+  lc.setRow(0, 3, B11111111);
+  lc.setRow(0, 4, B11111111);
+  lc.setRow(0, 5, B01110000);
+  lc.setRow(0, 6, B00111000);
+  lc.setRow(0, 7, B00011100);
+}
+
+void displayArrowRight() {
+  lc.setRow(0, 0, B00111000);
+  lc.setRow(0, 1, B00011100);
+  lc.setRow(0, 2, B00001110);
+  lc.setRow(0, 3, B11111111);
+  lc.setRow(0, 4, B11111111);
+  lc.setRow(0, 5, B00001110);
+  lc.setRow(0, 6, B00011100);
+  lc.setRow(0, 7, B00111000);
+}
+
+void stop() {
+  lc.setRow(0, 0, B11111111);
+  lc.setRow(0, 1, B11111111);
+  lc.setRow(0, 2, B11111111);
+  lc.setRow(0, 3, B11111111);
+  lc.setRow(0, 4, B11111111);
+  lc.setRow(0, 5, B11111111);
+  lc.setRow(0, 6, B11111111);
+  lc.setRow(0, 7, B11111111);
+}
